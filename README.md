@@ -14,7 +14,7 @@ GET http://localhost:8080/klasha/filter/{limit} takes a Path Variable of limit, 
 * Get Country data endpoint GET http://localhost:8080/klasha/data/{country} takes a Path Variable of country, returns a JSON body.
 
 * Convert currency endpoint POST http://localhost:8080/klasha/getRate takesa Request Body {
-  "country": {Desired Country},
-  "currency": {target currency},
-  "amount": {amount}
+  "country": Desired_Country,
+  "currency": target_currency,
+  "amount": amount
   } returns a JSON body.
