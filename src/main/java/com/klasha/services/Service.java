@@ -1,12 +1,15 @@
 package com.klasha.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.klasha.exceptions.CountryNotFound;
+import com.klasha.exceptions.IllegalInputException;
 import com.klasha.exceptions.RateNotFound;
 import com.klasha.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 
 
@@ -51,6 +54,8 @@ public class Service <T>{
         CityFilter nz  = new CityFilter(limit,"dsc","population","new zealand");
         CityFilter it  = new CityFilter(limit,"dsc","population","italy");
 
+        if(limit<1) throw new IllegalInputException("");
+
         String requestGh = helper.writeAsString(gh);
         String requestNz = helper.writeAsString(nz);
         String requestIt = helper.writeAsString(it);
@@ -84,7 +89,16 @@ public class Service <T>{
     public Map<String, List> statesAndCites(String country) throws JsonProcessingException, ParseException {
         States states = new States(country);
         String  req = helper.writeAsString(states);
-        Object all = helper.makeRequestWithRedirect(req,statesUrl).getBody();
+
+        ResponseEntity response;
+        try{
+           response = helper.makeRequestWithRedirect(req,statesUrl);
+        }
+        catch (Exception e){
+            throw new CountryNotFound("");
+        }
+
+        Object all = response.getBody();
         JSONObject all2 = (JSONObject) helper.parseJson(all.toString()).get("data");
         List <String> allStates = helper.extractData((List<Map>) all2.get("states"),"name");
 
@@ -109,9 +123,14 @@ public class Service <T>{
         Map<String,T> data = new HashMap<>();
         States states = new States(country);
         String  req = helper.writeAsString(states);
-
-
-        Object allPop = helper.makeRequestWithRedirect(req,populationUrl).getBody();
+        ResponseEntity response;
+        try {
+            response = helper.makeRequestWithRedirect(req,populationUrl);
+        }
+        catch (Exception e){
+            throw new CountryNotFound("");
+        }
+        Object allPop = response.getBody();
         JSONObject all2 = (JSONObject) helper.parseJson(allPop.toString()).get("data");
         List <String> allPopulation = helper.extractData((List<Map>) all2.get("populationCounts"),"value");
         data.put("Population", (T) allPopulation.get(allPopulation.size()-1));
@@ -142,7 +161,14 @@ public class Service <T>{
     public Convert convertCurrency(GetRateDto rateDto) throws ParseException, IOException {
         States states = new States(rateDto.getCountry());
         String  req = helper.writeAsString(states);
-        Object curr = helper.makeRequestWithRedirect(req,currencyUrl).getBody();
+        ResponseEntity response;
+        try {
+            response = helper.makeRequestWithRedirect(req,currencyUrl);
+        }
+        catch (Exception e){
+            throw new CountryNotFound("");
+        }
+        Object curr = response.getBody();
         JSONObject curr2 = (JSONObject) helper.parseJson(curr.toString()).get("data");
         Convert convert = new Convert();
         convert.setCurrency(curr2.get("currency").toString());
