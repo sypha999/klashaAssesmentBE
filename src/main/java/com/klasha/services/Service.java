@@ -2,6 +2,7 @@ package com.klasha.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.klasha.exceptions.CountryNotFound;
+import com.klasha.exceptions.CustomException;
 import com.klasha.exceptions.IllegalInputException;
 import com.klasha.exceptions.RateNotFound;
 import com.klasha.utils.*;
@@ -108,7 +109,13 @@ public class Service <T>{
 
             Cities city = new Cities(country, helper.getRequestableState(state));
             String req2 = helper.writeAsString(city);
-            ResponseEntity resp = helper.makeRequestWithRedirect(req2,citiesUrl);
+            ResponseEntity resp;
+            try {
+                resp = helper.makeRequestWithRedirect(req2,citiesUrl);
+            }
+            catch (Exception e){
+                throw new CustomException("Something went wrong");
+            }
             JSONObject allc = helper.parseJson(resp.getBody().toString());
             List<String> cities = (List<String>) allc.get("data");
 

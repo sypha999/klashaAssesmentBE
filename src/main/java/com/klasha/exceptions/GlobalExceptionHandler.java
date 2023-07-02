@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.client.HttpServerErrorException;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -24,6 +25,11 @@ public class GlobalExceptionHandler {
     public ResponseEntity<String> handlerForIllegalInputException(final IllegalInputException e) {
 
         return new ResponseEntity<>("Invalid input please try again with a valid input", HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(CustomException.class)
+    public ResponseEntity<String> handlerForInternalServerError(final CustomException e) {
+        return new ResponseEntity<>("Something went wrong from host", HttpStatus.BAD_REQUEST);
     }
 
 }
