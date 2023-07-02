@@ -41,7 +41,7 @@ public class Helper <T>{
     }
 
     public String capitalizeFirst(String s){
-        return s.charAt(0)+s.substring(1).toLowerCase();
+        return s.substring(0,1).toUpperCase()+s.substring(1).toLowerCase();
     }
 
     public List extractData(List<Map> mp,String key) throws ParseException {

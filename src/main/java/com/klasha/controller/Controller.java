@@ -16,7 +16,7 @@ import java.util.Map;
 @RestController
 @RequestMapping("city")
 @RequiredArgsConstructor
-public class Controller {
+public class Controller<T> {
 
     private final Service service;
 
@@ -30,5 +30,9 @@ public class Controller {
         return ResponseEntity.ok(service.statesAndCites(country));
     }
 
+    @GetMapping("data/{country}")
+    public ResponseEntity<Map<String,T>> getData(@PathVariable("country") String country) throws IOException, ParseException {
+        return ResponseEntity.ok(service.countryData(country));
+    }
 
 }

@@ -1,10 +1,7 @@
 package com.klasha.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.klasha.utils.Cities;
-import com.klasha.utils.CityFilter;
-import com.klasha.utils.Helper;
-import com.klasha.utils.States;
+import com.klasha.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
@@ -21,7 +18,7 @@ import java.util.Map;
 
 @org.springframework.stereotype.Service
 @RequiredArgsConstructor
-public class Service {
+public class Service <T>{
     private final Helper helper;
 
     @Value("${cities.filter}")
@@ -32,6 +29,18 @@ public class Service {
 
     @Value("${cities.states}")
     private String citiesUrl;
+
+    @Value("${country.population}")
+    private String populationUrl;
+
+    @Value("${capital.city}")
+    private String capitalUrl;
+
+    @Value("${country.location}")
+    private String locationUrl;
+
+    @Value("${country.currency}")
+    private String currencyUrl;
 
     public Map<String ,List> filter(int limit) throws IOException, ParseException {
 
@@ -89,6 +98,7 @@ public class Service {
             JSONObject allc = helper.parseJson(resp.getBody().toString());
             List<String> cities = (List<String>) allc.get("data");
 
+
             data.put(state,cities);
 
         }
@@ -97,13 +107,39 @@ public class Service {
     }
 
 
-    public void countryData(String country){
-//        population
-//        capital city
-//        location
-//                currency
-//        ISO2&3
+    public Map<String,T> countryData(String country) throws JsonProcessingException, ParseException {
 
+        Map<String,T> data = new HashMap<>();
+        States states = new States(country);
+        String  req = helper.writeAsString(states);
+
+
+        Object allPop = helper.makeRequestWithRedirect(req,populationUrl).getBody();
+        JSONObject all2 = (JSONObject) helper.parseJson(allPop.toString()).get("data");
+        List <String> allPopulation = helper.extractData((List<Map>) all2.get("populationCounts"),"value");
+        data.put("Population", (T) allPopulation.get(allPopulation.size()-1));
+
+        Object allCap = helper.makeRequestWithRedirect(req,capitalUrl).getBody();
+        JSONObject allCap2 = (JSONObject) helper.parseJson(allCap.toString()).get("data");
+        data.put("Capital", (T) allCap2.get("capital"));
+
+        Object loc = helper.makeRequestWithRedirect(req,locationUrl).getBody();
+        JSONObject loc2 = (JSONObject) helper.parseJson(loc.toString()).get("data");
+        Location location =  new Location();
+        location.setLatitude(Double.parseDouble(loc2.get("lat").toString()));
+        location.setLongitude(Double.parseDouble(loc2.get("long").toString()));
+        data.put("Location", (T) location);
+
+        Object curr = helper.makeRequestWithRedirect(req,currencyUrl).getBody();
+        JSONObject curr2 = (JSONObject) helper.parseJson(curr.toString()).get("data");
+        Iso iso = new Iso();
+        iso.setIso2(curr2.get("iso2").toString());
+        iso.setIso3(curr2.get("iso3").toString());
+        data.put("Currency", (T) curr2.get("currency").toString());
+        data.put("ISO 2&3", (T) iso);
+
+
+        return data;
     }
 
 }
