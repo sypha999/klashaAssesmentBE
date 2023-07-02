@@ -1,13 +1,12 @@
 package com.klasha.controller;
 
 import com.klasha.services.Service;
+import com.klasha.utils.Convert;
+import com.klasha.utils.GetRateDto;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.parser.ParseException;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
 import java.util.List;
@@ -33,6 +32,11 @@ public class Controller<T> {
     @GetMapping("data/{country}")
     public ResponseEntity<Map<String,T>> getData(@PathVariable("country") String country) throws IOException, ParseException {
         return ResponseEntity.ok(service.countryData(country));
+    }
+
+    @PostMapping("getRate")
+    public ResponseEntity<Convert> getRate(@RequestBody GetRateDto rateDto) throws IOException, ParseException {
+        return ResponseEntity.ok(service.convertCurrency(rateDto));
     }
 
 }

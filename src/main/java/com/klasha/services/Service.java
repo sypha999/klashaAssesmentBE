@@ -1,6 +1,7 @@
 package com.klasha.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.klasha.exceptions.NotFound;
 import com.klasha.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
@@ -136,14 +137,30 @@ public class Service <T>{
         return data;
     }
 
-    public Convert convertCurrency(String country,String currency,double amount) throws ParseException, JsonProcessingException {
-        States states = new States(country);
+    public Convert convertCurrency(GetRateDto rateDto) throws ParseException, IOException {
+        States states = new States(rateDto.getCountry());
         String  req = helper.writeAsString(states);
         Object curr = helper.makeRequestWithRedirect(req,currencyUrl).getBody();
         JSONObject curr2 = (JSONObject) helper.parseJson(curr.toString()).get("data");
-        curr2.get("currency").toString();
+        Convert convert = new Convert();
+        convert.setCurrency(curr2.get("currency").toString());
+        Map<String,Double> rates = helper.loadExchageRate();
+        Double rate ;
+        Double convAmount;
+        String search = curr2.get("currency").toString() +" to "+rateDto.getCurrency();
 
-return null;
+        rate = rates.get(search);
+        if (rate == null){
+            throw new NotFound("Rate not available");
+        }
+        else{
+            convAmount = rateDto.getAmount()/rate;
+        }
+
+        convert.setAmount(convAmount);
+
+
+        return convert;
     }
 
 }
