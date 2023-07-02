@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("city")
+@RequestMapping("klasha")
 @RequiredArgsConstructor
 public class Controller<T> {
 

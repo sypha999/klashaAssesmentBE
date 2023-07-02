@@ -89,23 +89,17 @@ public class Service <T>{
         for(String state:allStates){
             List <String> allCities = new ArrayList<>();
 
-            //fix bug on Lagos state
-            if(state.contains("Lagos")){state= helper.getRequestableState(state);}
-
-            Cities city = new Cities(country, state);
+            Cities city = new Cities(country, helper.getRequestableState(state));
             String req2 = helper.writeAsString(city);
             ResponseEntity resp = helper.makeRequestWithRedirect(req2,citiesUrl);
             JSONObject allc = helper.parseJson(resp.getBody().toString());
             List<String> cities = (List<String>) allc.get("data");
 
-
             data.put(state,cities);
-
         }
 
         return data;
     }
-
 
     public Map<String,T> countryData(String country) throws JsonProcessingException, ParseException {
 
@@ -140,6 +134,16 @@ public class Service <T>{
 
 
         return data;
+    }
+
+    public Convert convertCurrency(String country,String currency,double amount) throws ParseException, JsonProcessingException {
+        States states = new States(country);
+        String  req = helper.writeAsString(states);
+        Object curr = helper.makeRequestWithRedirect(req,currencyUrl).getBody();
+        JSONObject curr2 = (JSONObject) helper.parseJson(curr.toString()).get("data");
+        curr2.get("currency").toString();
+
+return null;
     }
 
 }

@@ -2,6 +2,7 @@ package com.klasha.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.opencsv.CSVReader;
 import lombok.RequiredArgsConstructor;
 import org.apache.hc.client5.http.classic.HttpClient;
 import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
@@ -10,6 +11,8 @@ import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
@@ -18,9 +21,8 @@ import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 @RequiredArgsConstructor
 @Service
@@ -65,11 +67,29 @@ public class Helper <T>{
     public String getRequestableState(String state){
         state= state.toLowerCase();
         if(state.contains("lagos")){return "Lagos";}
-        if(state.contains("state")){
-            return this.capitalizeFirst(state.substring(0,state.indexOf("state")));
-    }
-        else{ return this.capitalizeFirst(state);}
+      return state;
 }
+
+    public Map<String,Double> loadExchageRate() throws IOException {
+        Map<String,Double> rates = new HashMap<>();
+        Resource resource = new ClassPathResource("exchange_rate.csv");
+        List<List<String>> records = new ArrayList<List<String>>();
+        try (CSVReader csvReader = new CSVReader(new FileReader(resource.getFile()))) {
+            String[] values = null;
+            while ((values = csvReader.readNext()) != null) {
+                records.add(Arrays.asList(values));
+            }
+        } catch (FileNotFoundException e) {
+            throw new RuntimeException(e);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        records.remove(0);
+        for(List lst:records){
+            rates.put(lst.get(0)+" to "+lst.get(1),Double.parseDouble(lst.get(2).toString()));
+        }
+        return rates;
+    }
 
 
 
