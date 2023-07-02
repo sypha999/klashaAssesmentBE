@@ -1,7 +1,7 @@
 package com.klasha.services;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.klasha.exceptions.NotFound;
+import com.klasha.exceptions.RateNotFound;
 import com.klasha.utils.*;
 import lombok.RequiredArgsConstructor;
 import org.json.simple.JSONObject;
@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 
 
 import java.io.IOException;
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -151,10 +153,12 @@ public class Service <T>{
 
         rate = rates.get(search);
         if (rate == null){
-            throw new NotFound("Rate not available");
+            throw new RateNotFound("Rate not available");
         }
         else{
-            convAmount = rateDto.getAmount()/rate;
+            DecimalFormat df = new DecimalFormat("0.0000");
+            df.setRoundingMode(RoundingMode.UP);
+            convAmount = Double.valueOf(df.format(rateDto.getAmount()/rate));
         }
 
         convert.setAmount(convAmount);

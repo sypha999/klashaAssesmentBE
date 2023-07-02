@@ -7,10 +7,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
-    @ExceptionHandler(NotFound.class)
-    public ResponseEntity<String> handlerForfailedException(final NotFound e) {
+    @ExceptionHandler(RateNotFound.class)
+    public ResponseEntity<String> handlerForfailedException(final RateNotFound e) {
 
-        return new ResponseEntity<>("Not found", HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Rate Not found", HttpStatus.NOT_FOUND);
     }
 
 }
