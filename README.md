@@ -1,7 +1,7 @@
 # **KLASHA ASSESSMENT**
 
 * This application runs on http://localhost:8080
-* For hands n testing, the swagger url can be accessed fro http://localhost:8080/swagger
+* For hands on testing, the swagger url can be accessed fro http://localhost:8080/swagger
 
 #### **Documentation**
 All endpoints follow a request mapping of http://localhost:8080/klasha/{endpoint}
