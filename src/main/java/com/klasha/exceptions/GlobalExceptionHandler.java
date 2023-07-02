@@ -26,5 +26,4 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>("Invalid input please try again with a valid input", HttpStatus.BAD_REQUEST);
     }
 
-
 }
